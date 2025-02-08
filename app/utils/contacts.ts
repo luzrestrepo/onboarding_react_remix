@@ -1,6 +1,8 @@
 import { matchSorter } from "match-sorter";
-import sortBy from "sort-by";
+import { sort } from "fast-sort";
 import invariant from "tiny-invariant";
+
+
 
 type ContactMutation = {
   id?: string;
@@ -24,7 +26,7 @@ const fakeContacts = {
   async getAll(): Promise<ContactRecord[]> {
     return Object.keys(fakeContacts.records)
       .map((key) => fakeContacts.records[key])
-      .sort(sortBy("-createdAt", "last"));
+      /* .sort(sort("-createdAt", "last")); */
   },
 
   async get(id: string): Promise<ContactRecord | null> {
@@ -62,7 +64,7 @@ export async function getContacts(query?: string | null) {
       keys: ["first", "last"],
     });
   }
-  return contacts.sort(sortBy("last", "createdAt"));
+  /* return contacts.sort(sortBy("last", "createdAt")); */
 }
 
 export async function createEmptyContact() {
