@@ -4,6 +4,7 @@ import {
   Meta,
   Scripts,
   ScrollRestoration,
+  Outlet, // <-- Importa Outlet
 } from "@remix-run/react";
 
 export default function App() {
@@ -29,9 +30,9 @@ export default function App() {
               />
               <div id="search-spinner" aria-hidden hidden={true} />
             </Form>
-            <Form method="post">
-              <button type="submit">New</button>
-            </Form>
+            <Form action="/contacts/new" method="get">
+  <button type="submit">New</button>
+</Form>
           </div>
           <nav>
             <ul>
@@ -43,6 +44,11 @@ export default function App() {
               </li>
             </ul>
           </nav>
+        </div>
+
+        {/* 📌 Aquí agregamos Outlet para renderizar las rutas */}
+        <div id="content">
+          <Outlet />
         </div>
 
         <ScrollRestoration />
