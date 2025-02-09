@@ -34,7 +34,7 @@ const fakeContacts = {
   },
 
   async create(values: ContactMutation): Promise<ContactRecord> {
-    const id = values.id || Math.random().toString(36).substring(2, 9);
+    const id = values.id || `${values.first?.toLowerCase()}-${values.last?.toLowerCase()}`;
     const createdAt = new Date().toISOString();
     const newContact = { id, createdAt, ...values };
     fakeContacts.records[id] = newContact;
