@@ -1,75 +1,77 @@
-import { LoaderFunction, ActionFunction, json, redirect } from "@remix-run/node";
-import { useLoaderData, Form } from "@remix-run/react";
-import { getContact, updateContact } from "~/utils/contacts";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
+import invariant from "tiny-invariant";
+import { getContact } from "~/utils/contacts";
 
-export const loader: LoaderFunction = async ({ params }) => {
-  console.log("Params in edit loader:", params); // Verifica el parámetro contactId
-  const contact = await getContact(params.contactId || "");
+
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  // Verifica que el parámetro contactId existe
+  invariant(params.contactId, "Missing contactId param");
+
+  // Busca el contacto por ID
+  const contact = await getContact(params.contactId);
   if (!contact) {
     throw new Response("Not Found", { status: 404 });
   }
+
+  // Retorna el contacto como JSON
   return json({ contact });
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
-  const contactId = params.contactId;
-  if (!contactId) {
-    throw new Response("Not Found", { status: 404 });
-  }
-  const formData = await request.formData();
-  const updates = {
-    first: formData.get("first") as string,
-    last: formData.get("last") as string,
-    twitter: formData.get("twitter") as string,
-  };
-  await updateContact(contactId, updates);
-  return redirect(`/contacts/${contactId}`);
-};
-
-export default function EditContactPage() {
+export default function EditContact() {
   const { contact } = useLoaderData<typeof loader>();
 
   return (
-    <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">Edit Contact</h1>
-      <Form method="post">
-        <div className="mb-4">
-          <label>
-            First Name:
-            <input
-              type="text"
-              name="first"
-              defaultValue={contact.first}
-              className="border p-2 rounded w-full"
-            />
-          </label>
-        </div>
-        <div className="mb-4">
-          <label>
-            Last Name:
-            <input
-              type="text"
-              name="last"
-              defaultValue={contact.last}
-              className="border p-2 rounded w-full"
-            />
-          </label>
-        </div>
-        <div className="mb-4">
-          <label>
-            Twitter:
-            <input
-              type="text"
-              name="twitter"
-              defaultValue={contact.twitter}
-              className="border p-2 rounded w-full"
-            />
-          </label>
-        </div>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          Save Changes
-        </button>
-      </Form>
-    </div>
+    <Form key={contact.id} id="contact-form" method="post">
+      <p>
+        <span>Name</span>
+        <input
+          aria-label="First name"
+          defaultValue={contact.first}
+          name="first"
+          placeholder="First"
+          type="text"
+        />
+        <input
+          aria-label="Last name"
+          defaultValue={contact.last}
+          name="last"
+          placeholder="Last"
+          type="text"
+        />
+      </p>
+      <label>
+        <span>Twitter</span>
+        <input
+          defaultValue={contact.twitter}
+          name="twitter"
+          placeholder="@jack"
+          type="text"
+        />
+      </label>
+      <label>
+        <span>Avatar URL</span>
+        <input
+          aria-label="Avatar URL"
+          defaultValue={contact.avatar}
+          name="avatar"
+          placeholder="https://example.com/avatar.jpg"
+          type="text"
+        />
+      </label>
+      <label>
+        <span>Notes</span>
+        <textarea
+          defaultValue={contact.notes}
+          name="notes"
+          rows={6}
+        />
+      </label>
+      <p>
+        <button type="submit">Save</button>
+        <button type="button">Cancel</button>
+      </p>
+    </Form>
   );
 }

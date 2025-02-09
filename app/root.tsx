@@ -4,8 +4,23 @@ import {
   Meta,
   Scripts,
   ScrollRestoration,
-  Outlet, // <-- Importa Outlet
+  Outlet,
+  json, // <-- Importa Outlet
 } from "@remix-run/react";
+import type { LinksFunction } from "@remix-run/node";
+// existing imports
+
+import appStylesHref from "./app.css?url";
+import { getContacts } from "./utils/contacts";
+
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: appStylesHref },
+];
+
+export const loader = async () => {
+  const contacts = await getContacts();
+  return json({ contacts });
+};
 
 export default function App() {
   return (
@@ -47,7 +62,7 @@ export default function App() {
         </div>
 
         {/* 📌 Aquí agregamos Outlet para renderizar las rutas */}
-        <div id="content">
+        <div id="detail">
           <Outlet />
         </div>
 
